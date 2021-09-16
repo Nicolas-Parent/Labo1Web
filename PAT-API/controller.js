@@ -84,13 +84,31 @@ exports.math = function(req, res) {
               }
               case "/":
               {
-                reponse = {"op":operande, "x":x, "y":y, "valeur": x / y};
-                break;
+                if(x == 0 && y == 0)
+                  reponse = {"op":operande, "x":x, "y":y, "valeur": "NAN"}
+                else if(x == 0)
+                  reponse = {"op":operande, "x":x, "y":y, "valeur": "Infinity"}
+                else if(y == 0)
+                  reponse = {"op":operande, "x":x, "y":y, "valeur": "Infinity"}
+                else
+                {
+                  reponse = {"op":operande, "x":x, "y":y, "valeur": x / y};
+                  break;
+                }
               }
               case "%":
               {
-                reponse = {"op":operande, "x":x, "y":y, "valeur": x % y};
-                break;
+                if(x == 0 && y == 0)
+                  reponse = {"op":operande, "x":x, "y":y, "valeur": "NAN"}
+                else if(x == 0)
+                  reponse = {"op":operande, "x":x, "y":y, "valeur": "NAN"}
+                else if(y == 0)
+                  reponse = {"op":operande, "x":x, "y":y, "valeur": "NAN"}
+                else
+                {
+                  reponse = {"op":operande, "x":x, "y":y, "valeur": x % y};
+                  break;
+                }
               }
             }
           }
@@ -136,7 +154,11 @@ exports.math = function(req, res) {
           reponse = {"op":operande, "n":params["n"].trim(), "erreur": "Le paramètre n est inexistant"};
     }
     else
-      reponse = "L'oppérande est inexsistante";
+      reponse = {"n":params["n"].trim(), "op":operande, "erreur": "L'oppérande est inconnue"};
+  }
+  else
+  {
+    reponse = {"n":params["n"].trim(), "op":operande, "erreur": "L'oppérande est inexistante"};
   }
     
      
