@@ -1,6 +1,15 @@
 const { exit } = require('process');
 const url = require('url');
 
+function factoriser(nombre) {
+  if (nombre < 0)
+    return -1;
+  else if (nombre == 0)
+    return 1;
+  else {
+    return (nombre * factoriser(nombre - 1));
+  }
+}
 function estPremier(nombre) {
     let debut = 2;
     const limite = Math.sqrt(nombre);
@@ -9,17 +18,7 @@ function estPremier(nombre) {
     }
     return nombre > 1;
 }
-function calculerPremier(nombre) {
-    let debut = 2;
-    const limite = Math.sqrt(nombre);
-    while (debut <= limite) {
-        if (nombre % debut++ < 1)
-        {
-          return "Le nombre "+ nombre + " n'est pas premier";
-        }
-    }
-    return "Le nombre " + nombre + " est premier";
-}
+
 function nPremier(nombre){
     let compteur=0;
     const limite = 100000
@@ -39,57 +38,58 @@ exports.math = function(req, res) {
   const queryString = require('query-string');
   const params = queryString.parse(reqUrl.path);
   let reponse= {};
-  if(params["/math?op"] != null)
+  let operande = params["/api/maths?op"]
+  if(operande != null)
   {
     let x = parseInt(params["x"])
     let y = parseInt(params["y"])
     let n = parseInt(params["n"])
     
-    if(params["/math?op"] == " " || params["/math?op"] == "-" || params["/math?op"] == "*" || params["/math?op"] == "/"
-      || params["/math?op"] == "%" || params["/math?op"] == "!" || params["/math?op"] == "p" || params["/math?op"] == "np")
+    if(operande == " " || operande == "-" || operande == "*" || operande == "/"
+      || operande == "%" || operande == "!" || operande == "p" || operande == "np")
     {
       if(params["x"] != 0 && params["x"] != null && params["y"] != null && params["y"] != 0)
       {
         if(Object.keys(params).length < 3)
-          reponse = "Paramètres manquants"; 
+          reponse = {"erreur":"Paramètres manquants"}; 
         else if(Object.keys(params).length > 3)
-          reponse = "Paramètres en trops"; 
+          reponse = {"erreur":"Paramètres en trops"}; 
         else if(Object.keys(params).length == 3)
         {
           if(isNaN(x))
           {
-            reponse = {"op":params["/math?op"], "x":params["x"].trim(), "y":params["y"].trim(), "error": "x is not a number"};
+            reponse = {"op":operande, "x":params["x"].trim(), "y":params["y"].trim(), "erreur": "x n'est pas un nombre"};
           }
           else if(isNaN(y))
           {
-            reponse = {"op":params["/math?op"], "x":params["x"].trim(), "y":params["y"].trim(), "error": "y is not a number"};
+            reponse = {"op":operande, "x":params["x"].trim(), "y":params["y"].trim(), "erreur": "y n'est pas un nombre"};
           }
           else{
-            switch(params["/math?op"])
+            switch(operande)
             {
               case " ":
               {
-                reponse = {"op":params["/math?op"], "x":x, "y":y, "value": x + y};
+                reponse = {"op":operande, "x":x, "y":y, "valeur": x + y};
                 break;
               }
               case "-":
               {
-                reponse = {"op":params["/math?op"], "x":x, "y":y, "value": x - y};
+                reponse = {"op":operande, "x":x, "y":y, "valeur": x - y};
                 break;
               }
               case "*":
               {
-                reponse = {"op":params["/math?op"], "x":x, "y":y, "value": x * y};
+                reponse = {"op":operande, "x":x, "y":y, "valeur": x * y};
                 break;
               }
               case "/":
               {
-                reponse = {"op":params["/math?op"], "x":x, "y":y, "value": x / y};
+                reponse = {"op":operande, "x":x, "y":y, "valeur": x / y};
                 break;
               }
               case "%":
               {
-                reponse = {"op":params["/math?op"], "x":x, "y":y, "value": x % y};
+                reponse = {"op":operande, "x":x, "y":y, "valeur": x % y};
                 break;
               }
             }
@@ -97,36 +97,43 @@ exports.math = function(req, res) {
           
         }
       }
-      else if(params["n"] != 0 && params["n"] != null && params["n"])
+      else if(params["n"] != 0 && params["n"] != null)
       {
         if(Object.keys(params).length < 2)
-          reponse = "Paramètres manquants"; 
+          reponse = {"erreur":"Paramètres manquants"}; 
         else if(Object.keys(params).length > 2)
-          reponse = "Paramètres en trops"; 
+          reponse = {"erreur":"Paramètres en trops"}; 
         else
         {
-          switch(params["/math?op"])
+          if(isNaN(n))
           {
-            case "!":
+            reponse = {"op":operande, "n":params["n"].trim(), "erreur": "n n'est pas un nombre"};
+          }
+          else
+          {
+            switch(operande)
             {
-              reponse = {"n": n, "op":params["/math?op"], "value":calculerPremier(n)};
-              break;
-            }
-            case "p":
-            {
-              reponse = {"n": n, "op":params["/math?op"], "value":estPremier(n)};
-              break;
-            }
-            case "np":
-            {
-              reponse = {"n": n, "op":params["/math?op"], "value":nPremier(n)};
-              break;
+              case "!":
+              {
+                reponse = {"n": n, "op":operande, "valeur":factoriser(n)};
+                break;
+              }
+              case "p":
+              {
+                reponse = {"n": n, "op":operande, "valeur":estPremier(n)};
+                break;
+              }
+              case "np":
+              {
+                reponse = {"n": n, "op":operande, "valeur":nPremier(n)};
+                break;
+              }
             }
           }
         }
       }
       else 
-          reponse = "Le ou les nombre(s) sont null(s)";
+          reponse = {"op":operande, "n":params["n"].trim(), "erreur": "Le paramètre n est inexistant"};
     }
     else
       reponse = "L'oppérande est inexsistante";

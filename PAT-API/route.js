@@ -9,7 +9,7 @@ module.exports = http.createServer((req, res) => {
   let mathOps = require('./controller.js');
   const reqUrl =  url.parse(req.url, true);
   // GET endpoint
-  if(reqUrl.pathname == '/math' && req.method === 'GET') {
+  if(reqUrl.pathname == '/api/maths' && req.method === 'GET') {
     console.log('Request type: ' + req.method + ' Endpoint: ' + req.url);
     mathOps.math(req, res);
   // URL invalide
